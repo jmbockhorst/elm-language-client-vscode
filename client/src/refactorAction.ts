@@ -9,19 +9,20 @@ export function registerCommands(
   context.subscriptions.push(
     commands.registerCommand(
       "elm.refactor",
-      async (command: string, params: any, commandInfo: any) => {
-        if (command === "moveFunction") {
-          await moveFunction(languageClient, params, commandInfo);
+      async (command: string, params: any, name: string, type: string) => {
+        if (command === "move") {
+          await move(languageClient, params, name, type);
         }
       },
     ),
   );
 }
 
-async function moveFunction(
+async function move(
   languageClient: LanguageClient,
   params: CodeActionParams,
-  commandInfo: any,
+  name: string,
+  type: string,
 ) {
   const moveDestinations = await languageClient.sendRequest(
     GetMoveDestinationRequest,
@@ -37,7 +38,7 @@ async function moveFunction(
     !moveDestinations.destinations.length
   ) {
     window.showErrorMessage(
-      "Cannot find possible file targets to move the selected method to.",
+      `Cannot find possible file targets to move the selected ${type} to.`,
     );
     return;
   }
@@ -52,9 +53,8 @@ async function moveFunction(
     },
   );
 
-  const functionName = commandInfo || "";
   const selected = await window.showQuickPick(destinationNodeItems, {
-    placeHolder: `Select the new file for the function ${functionName}.`,
+    placeHolder: `Select the new file for the ${type} ${name}.`,
   });
 
   if (!selected) {

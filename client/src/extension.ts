@@ -138,7 +138,7 @@ export async function activate(context: ExtensionContext) {
                 server: config.trace.server,
               },
               extendedCapabilities: {
-                moveFunctionRefactoringSupport: true,
+                moveRefactoringSupport: true,
                 exposeUnexposeSupport: true,
               },
             }
