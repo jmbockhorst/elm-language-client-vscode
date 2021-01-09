@@ -4,6 +4,8 @@ import {
   CodeAction,
   CodeLens,
   commands,
+  debug,
+  DebugConfigurationProvider,
   ExtensionContext,
   Location,
   OutputChannel,
@@ -93,7 +95,10 @@ export function activate(context: ExtensionContext): void {
 
   function didOpenTextDocument(document: TextDocument) {
     // We are only interested in everything elm, no handling for untitled files for now
-    if (document.languageId !== "elm") {
+    if (
+      document.languageId !== "elm" &&
+      !document.uri.toString().endsWith("elm.json")
+    ) {
       return;
     }
 
@@ -211,6 +216,35 @@ export function activate(context: ExtensionContext): void {
         }
       : {};
   }
+
+  const debugConfigurationProvider: DebugConfigurationProvider = {
+    resolveDebugConfiguration: (_, debugConfiguration) => {
+      if (!debugConfiguration.customDescriptionGenerator) {
+        debugConfiguration.customDescriptionGenerator =
+          "function() { return customDescriptionGenerator ? customDescriptionGenerator(this, defaultValue) : defaultValue; }";
+      }
+
+      if (!debugConfiguration.customPropertiesGenerator) {
+        debugConfiguration.customPropertiesGenerator =
+          "function() { return customPropertiesGenerator ? customPropertiesGenerator(this): this; }";
+      }
+
+      return debugConfiguration;
+    },
+  };
+
+  context.subscriptions.push(
+    debug.registerDebugConfigurationProvider(
+      "pwa-chrome",
+      debugConfigurationProvider,
+    ),
+  );
+  context.subscriptions.push(
+    debug.registerDebugConfigurationProvider(
+      "pwa-msedge",
+      debugConfigurationProvider,
+    ),
+  );
 }
 
 export function deactivate(): Thenable<void> | undefined {

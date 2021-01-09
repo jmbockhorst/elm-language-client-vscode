@@ -24,7 +24,8 @@
   },
   "activationEvents": [
     "onLanguage:elm",
-    "workspaceContains:**/elm.json"
+    "workspaceContains:**/elm.json",
+    "onDebugInitialConfigurations"
   ],
   "main": "./client/out/extension",
   "bin": {
@@ -135,7 +136,12 @@
           "description": "Skips confirmation for the Install Package code action"
         }
       }
-    }
+    },
+    "breakpoints": [
+      {
+        "language": "elm"
+      }
+    ]
   },
   "scripts": {
     "version-patch": "npm --no-git-tag-version version patch",
